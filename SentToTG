@@ -1,0 +1,18 @@
+function sendTelegramMessage(token, chatId, text) {
+  var url = 'https://api.telegram.org/bot' + token + '/sendMessage';
+  var payload = {
+    method: 'post',
+    payload: {
+      chat_id: chatId,
+      text: text,
+    },
+    muteHttpExceptions: true,
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(url, payload);
+    Logger.log(response.getContentText());
+  } catch (error) {
+    Logger.log('Error sending Telegram message: ' + error);
+  }
+}

@@ -1,0 +1,48 @@
+function Vnesenie_Vidaca_2306() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  // Получаем активную ячейку
+  var activeCell = sheet.getActiveCell();
+  var activeRow = activeCell.getRow();
+
+  // Получаем данные из строки с активной ячейкой
+  var data = sheet.getRange(activeRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // Получаем значение из колонки 12
+  var plnVn = data[12];
+
+  // Создаем предложение в зависимости от наличия значения в колонке 12
+  var sentence2306 = "";
+
+  if (plnVn) {
+    var tg = data[7];
+    var kasa = data[9];
+    var usdtVn = data[11];
+    var rate = data[14];
+    var fee = data[15];
+    var random8DigitNumber = Math.floor(10000000 + Math.random() * 90000000); // генератор 8 значных чисел
+
+    // Создаем предложение, если есть значение в колонке 12
+    sentence2306 = "Внесение (2306)\n" + plnVn + "\nКОД\n" + random8DigitNumber + "\nПродаем " + usdtVn + " usdt -" + fee + " % * " + rate + " =" + plnVn + " pln.\nПолучатель " + tg + "\nКасса " + kasa + "\nПрим. ULTRAPROFIT";
+
+  } else {
+    var tg = data[7];
+    var kasa = data[9];
+    var plnPl = data[10];
+    var usdtPl = data[13];
+    var rate = data[14];
+    var fee = data[15];
+    var random16DigitNumber = Math.floor(1000000000000000 + Math.random() * 9000000000000000); // генератор 16 значных чисел
+
+    // Создаем альтернативное предложение, если нет значения в колонке 12
+    sentence2306 = "Получение (2306)\n" + plnPl + "\nКОД\n" + random16DigitNumber + "\nПокупаем " + usdtPl + " usdt +" + fee + " % * " + rate + " =" + plnPl + " pln.\nПолучатель " + tg + "\nКасса " + kasa + "\nПрим. ULTRAPROFIT";
+  }
+
+  // Устанавливаем значение в 21 столбец текущей строки
+  //sheet.getRange(activeRow, 21).setValue(sentence2306);
+
+  // Отправляем сообщение в Telegram
+  var telegramBotToken = 'TOKEН'; //Вставляем токен Бота
+  var chatId = 'ИДЕНТИФИКАТОР ЧАТА'; // You can obtain this by messaging your bot and checking the updates API response
+  sendTelegramMessage(telegramBotToken, chatId, sentence2306);
+}

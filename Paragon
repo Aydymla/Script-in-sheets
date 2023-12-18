@@ -1,0 +1,78 @@
+function createAndSendPDF() {
+  // Получаем активный лист "Paragon"
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Paragon');
+
+  // Запрашиваем ID транзакции у пользователя
+  var response = Browser.inputBox('Введите ID транзакции', 'Например, 12345', Browser.Buttons.OK_CANCEL);
+
+  // Проверяем, был ли пользователь отменен ввод
+  if (response === 'cancel') {
+    return;
+  }
+
+  // Получаем ID транзакции
+  var transactionId = response.trim();
+
+  // Вписываем ID транзакции в ячейку B6 листа "Paragon"
+  sheet.getRange('B6').setValue(transactionId);
+
+  // Сохраняем лист "Paragon" как PDF
+  var pdfFile = saveSheetAsPDF('Paragon', 'Paragon');
+
+  // Отправляем PDF в Telegram
+  sendPDFToTelegram(pdfFile);
+}
+
+function saveSheetAsPDF(sheetName, pdfName) {
+  // Получаем активный документ
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Получаем лист по имени
+  var sheet = spreadsheet.getSheetByName(sheetName);
+
+  // Получаем ID документа
+  var spreadsheetId = spreadsheet.getId();
+
+  // Формируем URL для экспорта в PDF
+  var url = 'https://docs.google.com/spreadsheets/d/' + spreadsheetId +
+            '/export?exportFormat=pdf&format=pdf' +
+            '&gid=' + sheet.getSheetId();
+
+  // Получаем PDF-файл
+  var pdfFile = UrlFetchApp.fetch(url, {
+    headers: {
+      Authorization: 'Bearer ' + ScriptApp.getOAuthToken(),
+    },
+  });
+
+  // Создаем PDF-файл
+  var pdfBlob = DriveApp.createFile(pdfFile.getBlob()).setName(pdfName + '.pdf');
+
+  return pdfBlob;
+}
+
+
+function sendPDFToTelegram(pdfFile) {
+  var token = 'ТОКЕН БОТА';
+  var chatId = 'ИДЕНТИФИКАТОР ЧАТА';
+
+  // Получаем ID файла в Google Drive
+  var fileId = DriveApp.createFile(pdfFile).getId();
+
+  // Получаем содержимое файла
+  var pdfBlob = pdfFile.getBlob();
+
+  var url = 'https://api.telegram.org/bot' + token + '/sendDocument';
+
+  var payload = {
+    'method': 'post',
+    'payload': {
+      'chat_id': chatId,
+      'document': pdfBlob,
+//      'caption': 'Paragon'
+    }
+  };
+
+  // Отправляем файл через API Telegram
+  UrlFetchApp.fetch(url, payload);
+}

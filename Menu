@@ -1,0 +1,15 @@
+// Функция onOpen() запускается всегда при открытии документа
+// https://developers.google.com/apps-script/guides/triggers/#onopen
+function onOpen()
+{
+    // Создаём новое меню
+    // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
+    SpreadsheetApp.getUi()
+        .createMenu('Доработки')
+        .addSubMenu(SpreadsheetApp.getUi().createMenu('Коды для Бухгалтерии')
+            .addItem('1219/1230', 'Vnesenie_Vidacha_1219_1230')
+            .addItem('2306', 'Vnesenie_Vidaca_2306'))
+        .addSeparator()
+        .addItem('PDF чек', 'createAndSendPDF')
+        .addToUi();
+}

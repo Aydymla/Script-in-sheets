@@ -1,0 +1,46 @@
+function Vnesenie_Vidacha_1219_1230() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  // Получаем активную ячейку
+  var activeCell = sheet.getActiveCell();
+  var activeRow = activeCell.getRow();
+
+  // Получаем данные из строки с активной ячейкой
+  var data = sheet.getRange(activeRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // Получаем значение из колонки 12
+  var plnVn = data[12];
+
+  // Создаем предложение в зависимости от наличия значения в колонке 12
+  var sentence12191230 = "";
+
+  if (plnVn) {
+    var usdtVn = data[11];
+    var rate = data[14];
+    var fee = data[15];
+    var random8DigitNumber = Math.floor(10000000 + Math.random() * 90000000);
+    var random16DigitNumber = Math.floor(1000000000000000 + Math.random() * 9000000000000000);
+
+    // Создаем предложение, если есть значение в колонке 12
+    sentence12191230 = "Инкасация 1230\n" + plnVn + " pln \nКОД\n" + random16DigitNumber + "\n'Продаем " + usdtVn + " usdt -" + fee + " % * " + rate + " =" + plnVn + " pln.' \nКасса Вроцлав\n\nВнесение 1219\n" + plnVn + " pln \nКОД\n" + random8DigitNumber + "\n'Продаем " + usdtVn + " usdt -" + fee + " % * " + rate + " =" + plnVn + " pln.' \nКасса ULTRAPROFIT\n\nДолг -\n" + usdtVn + " usdt\n КОД 9000\n'Продаем " + usdtVn + " usdt -" + fee + " % * " + rate + " =" + plnVn + " pln.'";
+
+  } else {
+    var plnPl = data[10];
+    var usdtPl = data[13];
+    var rate = data[14];
+    var fee = data[15];
+    var random8DigitNumber = Math.floor(10000000 + Math.random() * 90000000);
+    var random16DigitNumber = Math.floor(1000000000000000 + Math.random() * 9000000000000000);
+
+    // Создаем альтернативное предложение, если нет значения в колонке 12
+    sentence12191230 = "Инкасация 1219\n" + plnPl + " pln \nКОД\n" + random16DigitNumber + "\n'Покупаем " + usdtPl + " usdt +" + fee + " % * " + rate + " =" + plnPl + " pln.' \nКасса ULTRAPROFIT\n\nВнесение 1230\n" + plnPl + " pln \nКОД\n" + random8DigitNumber + "\n'Покупаем " + usdtPl + " usdt +" + fee + " % * " + rate + " =" + plnPl + " pln.' \nКасса Вроцлав\n\nДолг +\n" + usdtPl + " usdt\n КОД 9000\n'Покупаем " + usdtPl + " usdt +" + fee + " % * " + rate + " =" + plnPl + " pln.'";
+  }
+
+  // Устанавливаем значение в 21 столбец текущей строки
+  //sheet.getRange(activeRow, 21).setValue(sentence);
+
+  // Отправляем сообщение в Telegram
+  var telegramBotToken = 'ТОКЕН БОТА';
+  var chatId = 'ИД ЧАТА'; // You can obtain this by messaging your bot and checking the updates API response
+  sendTelegramMessage(telegramBotToken, chatId, sentence12191230);
+}

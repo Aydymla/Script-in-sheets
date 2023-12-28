@@ -1,0 +1,62 @@
+function writeDifferenceToSheet() {
+  // Получаем объект с активной (открытой в данный момент) таблицей
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+
+  // Получаем все значения из текущего листа таблицы
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+
+  // Извлекаем массив дат (колонка A), массив значений из колонки K и массив значений из колонки M
+  var dates = values.map(row => row[0]);
+  var valuesK = values.map(row => row[10]);
+  var valuesM = values.map(row => row[12]);
+  var valuesU = values.map(row => row[21]); // Добавляем массив значений из колонки V
+
+  // Получаем текущую дату и форматируем её в строку 'dd.MM.yyyy'
+  var now = new Date();
+  var currentDate = Utilities.formatDate(now, Session.getScriptTimeZone(), 'dd.MM.yyyy');
+
+  // Инициализируем переменные для хранения сумм значений из колонок K и M
+  var sumK = 0;
+  var sumM = 0;
+
+  // Проходим по всем строкам и проверяем, соответствует ли дата текущей дате
+  for (var i = 1; i < dates.length; i++) {
+    // Форматируем дату текущей строки в строку 'dd.MM.yyyy'
+    var date = Utilities.formatDate(new Date(dates[i]), Session.getScriptTimeZone(), 'dd.MM.yyyy');
+
+    // Если дата совпадает с текущей датой, добавляем значения из K и M
+    if (date === currentDate) {
+      // Преобразуем значения в числа, при необходимости, и добавляем к суммам
+      sumK += isNaN(valuesK[i]) ? 0 : Number(valuesK[i]);
+      sumM += isNaN(valuesM[i]) ? 0 : Number(valuesM[i]);
+    }
+  }
+
+  // Вычисляем разницу между суммами значений из колонок K и M
+  var difference = sumM - sumK;
+
+  // Ищем последнюю непустую ячейку в колонке V
+  var lastValueU = valuesU.reverse().find(value => value !== '');
+
+  // Если найдена последняя непустая ячейка в колонке U, добавляем к ней разницу
+  if (lastValueU !== undefined) {
+    lastValueU += difference;
+
+  // Ищем первую ячейку сегодняшней даты в колонке A
+  var firstCellInU = sheet.createTextFinder(currentDate).findNext();
+
+  // Если сегодняшняя дата уже присутствует в колонке A
+  if (firstCellInU) {
+    // Записываем разницу в ячейку в том же ряду в колонке U (21 столбец)
+    sheet.getRange(firstCellInU.getRow(), 22).setNumberFormat('#,##0.00').setValue(Number(lastValueU));
+    
+  } else {
+    // Если колонка V пуста, записываем разницу в новую строку в конце таблицы
+    var lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow + 1, 1).setValue(currentDate);
+    sheet.getRange(lastRow + 1, 22).setNumberFormat('#,##0.00').setValue(Number(difference));
+    }
+  }
+}
